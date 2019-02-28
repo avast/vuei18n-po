@@ -1,0 +1,32 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: avast-antivirus-for-win\n"
+"Language: ko_KR\n"
+"MIME-Version: 1.0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: avast-antivirus-for-win\n"
+"X-Crowdin-Language: ko\n"
+"X-Crowdin-File: en.po\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Last-Translator: Avast <chocholous@avast.com>\n"
+"Language-Team: Korean\n"
+"PO-Revision-Date: 2018-07-11 14:26\n"
+
+msgctxt "global.launch"
+msgid "Launch"
+msgstr "시작"
+
+msgctxt "about"
+msgid "About"
+msgstr "정보"
+
+msgctxt "issues"
+msgid "%s issue found."
+msgid_plural "%s issues found."
+msgstr[0] "%s 문제 발견."
+
+msgctxt "gamemode.game.run"
+msgid "Launch"
+msgstr "실행"
+
