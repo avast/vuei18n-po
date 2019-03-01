@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 let argv = require('minimist')(process.argv);
 
 if (argv._) {
