@@ -12,6 +12,14 @@
             "args": [
             ],
             "outputCapture": "std"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "cli",
+            "program": "${workspaceRoot}/cli.js",
+            "args": [
+            ]
         }
     ]
 }
