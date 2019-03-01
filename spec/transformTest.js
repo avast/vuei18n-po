@@ -28,9 +28,7 @@ describe('po transform', function () {
   it('parses subkeys', async function () {
     const translations = await vuei18nPo({ po: 'spec/data/en.po' });
 
-    expect(translations.en.messages).toEqual(jasmine.objectContaining({
-      gamemode: { game: { run: 'Launch' } }
-    }));
+    expect(translations.en.messages).toEqual(jasmine.objectContaining({'gamemode.game.run': 'Launch'}));
   });
 
   it('returns a valid plural function', async function () {
@@ -85,11 +83,7 @@ describe('po code generation', function () {
       json = require('./data/out/messages.json');
 
       expect(json).toEqual(jasmine.objectContaining({
-        en: jasmine.objectContaining({
-          global: {
-            launch: 'Launch'
-          }
-        })
+        en: jasmine.objectContaining({ 'global.launch': 'Launch' })
       }));
     }
     catch(ex) {
@@ -124,11 +118,7 @@ describe('po code generation', function () {
     try {
       json = require('./data/out/en.json');
 
-      expect(json).toEqual(jasmine.objectContaining({
-        global: {
-          launch: 'Launch'
-        }
-      }));
+      expect(json).toEqual(jasmine.objectContaining({ 'global.launch': 'Launch' }));
     }
     catch(ex) {
       fail(ex);

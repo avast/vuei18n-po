@@ -58,7 +58,7 @@ async function main(options) {
           item.msgid + ' | ' + item.msgid_plural)
           .replace(/%s/g, '{n}');
       }
-      objectPathSet(messages, item.msgctxt, value);
+      messages[item.msgctxt] = value;
     });
   }
 
@@ -132,19 +132,6 @@ function parsePlurals(header) {
   let pluralFunc = match[2];
 
   return { plural: 'function (n) { const rv = ' + pluralFunc + '; return Number(rv); }' };
-}
-
-function objectPathSet(obj, path, value) {
-  const parts = path.split(".");
-  let counter = parts.length;
-  let ref;
-
-  const getRef = ref => ref || obj;
-
-  for (let part of parts) {
-    counter--;
-    ref = getRef(ref)[part] = (counter && (getRef(ref)[part] || {})) || value;
-  }
 }
 
 module.exports = main;

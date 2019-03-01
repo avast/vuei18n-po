@@ -3,7 +3,7 @@ const rmrf = require('rimraf').sync;
 const VueI18n = require('vue-i18n');
 const Vue = require('vue');
 
-fdescribe('VueI18n', function () {
+describe('VueI18n', function () {
   Vue.use(VueI18n);
 
   beforeEach(function () {
