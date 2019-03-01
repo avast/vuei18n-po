@@ -1,7 +1,9 @@
 'use strict';
 
 const glob = require('glob').sync;
+const mkdir = require('make-dir').sync;
 const path = require('path');
+const fs = require('fs');
 const po = require('pofile');
 
 /**
@@ -15,8 +17,10 @@ const po = require('pofile');
  * }
  * @return promise {
  *   langCode1: {
- *     key1: {
- *       subkey1: value
+ *     messages: {
+ *       key1: {
+ *         subkey1: value
+ *       }
  *     }
  *   }
  * }
@@ -33,9 +37,13 @@ async function main(options) {
   let json = {};
 
   for (var lang in pos) {
-    json[lang] = {};
-    let messages = json[lang];
-    pos[lang].forEach(item => {
+    json[lang] = {
+      messages: {},
+      plural: pos[lang].plural
+    };
+    let messages = json[lang].messages;
+
+    pos[lang].messages.forEach(item => {
       let value;
       if (!item.msgid_plural) {
         value = item.msgstr[0] || item.msgid;
@@ -52,6 +60,38 @@ async function main(options) {
       }
       objectPathSet(messages, item.msgctxt, value);
     });
+  }
+
+  if (options.messagesFile) {
+    if (path.basename(options.messagesFile) != options.messagesFile) {
+      mkdir(path.dirname(options.messagesFile));
+    }
+
+    let messages = {};
+    for (let lang in json) {
+      messages[lang] = json[lang].messages;
+    }
+    fs.writeFileSync(options.messagesFile, JSON.stringify(messages, null, 2), 'utf8');
+  }
+
+  if (options.pluralRules) {
+    if (path.basename(options.pluralRules) != options.pluralRules) {
+      mkdir(path.dirname(options.pluralRules));
+    }
+
+    let rules = 'module.exports = {\n' +
+      Object.keys(json).map(lang => '  ' + lang + ': ' + json[lang].plural).join(',\n') +
+      '\n};\n';
+
+    fs.writeFileSync(options.pluralRules, rules, 'utf8');
+  }
+
+  if (options.messagesDir) {
+    mkdir(options.messagesDir);
+
+    for (let lang in json) {
+      fs.writeFileSync(path.join(options.messagesDir, lang + '.json'), JSON.stringify(json[lang].messages, null, 2), 'utf8');
+    }
   }
 
   return json;
@@ -72,11 +112,26 @@ function parseFiles(fileNames, localeNameHeader) {
       }
       else {
         const name = (localeNameHeader && data.headers[localeNameHeader]) || path.basename(fname, path.extname(fname));
-        resolve({ [name]: data.items });
+        resolve({
+          [name]: {
+            messages: data.items,
+            ...parsePlurals(data.headers['Plural-Forms'])
+          }
+        });
       }
     });
   })))
     .then(values => values.reduce((obj, entry) => ({ ...obj, ...entry }), {}));
+}
+
+function parsePlurals(header) {
+  const match = header.match(/nplurals=([0-9]+).*plural=(.+)/);  // the trailing \n is already removed by pofile
+  if (!match) {
+    throw new Error('Cannot parse plural definition: ' + header);
+  }
+  let pluralFunc = match[2];
+
+  return { plural: 'function (n) { const rv = ' + pluralFunc + '; return Number(rv); }' };
 }
 
 function objectPathSet(obj, path, value) {
