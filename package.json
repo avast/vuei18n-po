@@ -1,6 +1,6 @@
 {
   "name": "vuei18n-po",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "transform gettext .po files for vue-i18n",
   "main": "index.js",
   "bin": {
