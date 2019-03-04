@@ -79,8 +79,8 @@ async function main(options) {
       mkdir(path.dirname(options.pluralRules));
     }
 
-    let rules = 'module.exports = {\n' +
-      Object.keys(json).map(lang => '  ' + lang + ': ' + json[lang].plural).join(',\n') +
+    let rules = '/* eslint-disable no-extra-semi */\nmodule.exports = {\n' +
+      Object.keys(json).map(lang => '  "' + lang + '": ' + json[lang].plural).join(',\n') +
       '\n};\n';
 
     fs.writeFileSync(options.pluralRules, rules, 'utf8');
