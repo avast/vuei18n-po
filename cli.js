@@ -2,7 +2,10 @@
 let argv = require('minimist')(process.argv);
 
 if (argv._) {
-  const myself = argv._.indexOf(__filename);
+  let myself = argv._.indexOf(__filename);
+  if (myself == -1) {
+    myself = argv._.findIndex(a => a.indexOf('.bin/vuei18n-po') != -1);
+  }
   if (myself != -1 && myself + 1 < argv._.length) {
     argv.po = argv._.slice(myself + 1);
   }
