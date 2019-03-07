@@ -32,6 +32,10 @@ async function main(options) {
 
   const inputPoFiles = glob2names(options.po);
 
+  if (inputPoFiles.length == 0) {
+    console.error('Warning: no files found at', Array.isArray(options.po) ? options.po.join(', ') : options.po);
+  }
+
   const pos = await parseFiles(inputPoFiles, options.localeNameHeader);
 
   let json = {};
