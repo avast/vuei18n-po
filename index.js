@@ -111,13 +111,18 @@ function parseFiles(fileNames, localeNameHeader) {
         reject(err);
       }
       else {
-        const name = (localeNameHeader && data.headers[localeNameHeader]) || path.basename(fname, path.extname(fname));
-        resolve({
-          [name]: {
-            messages: data.items,
-            ...parsePlurals(data.headers['Plural-Forms'])
-          }
-        });
+        try {
+          const name = (localeNameHeader && data.headers[localeNameHeader]) || path.basename(fname, path.extname(fname));
+          resolve({
+            [name]: {
+              messages: data.items,
+              ...parsePlurals(data.headers['Plural-Forms'])
+            }
+          });
+        }
+        catch (ex) {
+          reject(ex);
+        }
       }
     });
   })))
