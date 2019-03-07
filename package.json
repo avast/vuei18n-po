@@ -2,6 +2,7 @@
   "name": "vuei18n-po",
   "version": "1.0.5",
   "description": "transform gettext .po files for vue-i18n",
+  "keywords": [ "vue", "vue-i18n", "gettext", "po", "locale", "localization", "translation" ],
   "main": "index.js",
   "bin": {
     "vuei18n-po": "./cli.js"
