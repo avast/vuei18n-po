@@ -14,6 +14,7 @@ const po = require('pofile');
  *   pluralRules: (optional) output javascript file exporting an object { langCode1: (choice, choicesLength) => choiceIndex, langCode2: ... }
  *   messagesFile: (optional) single output JSON file containing all translations for all languages
  *   messagesDir: (optional) output directory containing a JSON file per language
+ *   whiteList: (optional) glob of files that are tested for presence of the message keys; the unnused are filtered out
  * }
  * @return promise {
  *   langCode1: {
@@ -37,6 +38,10 @@ async function main(options) {
   }
 
   const pos = await parseFiles(inputPoFiles, options.localeNameHeader);
+
+  if (options.whiteList) {
+    filterByWhitelist(options.whiteList, pos);
+  }
 
   let json = {};
 
@@ -141,6 +146,92 @@ function parsePlurals(header) {
   let pluralFunc = match[2];
 
   return { plural: 'function (n) { const rv = ' + pluralFunc + '; return Number(rv); }' };
+}
+
+function filterByWhitelist(whitelistGlob, pos) {
+  let removalCandidates = new Set([]);  // for messages filtering at the end
+  let removalRes = new Set([]);         // for whitelist files processing
+
+  // preprocess the messages from *.po so that we can traverse the disk with whitelist files in one go
+  for (let lang in pos) {
+    pos[lang].messages.forEach(m => {
+      if (removalCandidates.has(m.msgctxt)) {
+        return;
+      }
+      if (!m.msgctxt) {
+        let meaningfulCopy = {};
+        for (let k in m) {
+          if (!!m[k] && (typeof m[k] !== 'object' || Object.keys(m[k]).length > 0))
+            meaningfulCopy[k] = m[k];
+        }
+        console.error('invalid entry in language', lang, ':', JSON.stringify(meaningfulCopy));
+        return;
+      }
+
+      removalCandidates.add(m.msgctxt);
+
+      let reEntry = { msgctxt: m.msgctxt };
+
+      if (m.msgctxt.indexOf('.') == -1) {
+        reEntry.re = new RegExp('[\'"`]' + m.msgctxt + '[\'"`]');
+      }
+      else {
+        // either one of the components ends with .', .", .` or .$ or the full key matches
+        // `namespace + '.rest.of.the.path'` will thus fail
+        // also, `foo.${something}.bar` will incorrectly let foo.xxx.yyy in
+        const components = m.msgctxt.split('.');
+        const reStr = '([\'"`]' + components.slice(1)
+          .reduce((prefixes, val, idx) => {  // reduce returns an array of strings [ c0, c0[.]c1, c0[.]c1[.]c2, ... ]
+            prefixes.push(prefixes[idx] + '[.]' + val);  // take the last entry in the array and create a new one, one component longer
+            return prefixes;
+          }, [ components[0] ])
+          .join('[.][\'"`$])|([\'"`]') + '[\'"`])';  // join the prefixes returned from reduce
+                                                     // as alternatives <some quotation>c0.<some quotation> || <some quotation>c0.c1.<some quotation> || ... || <full key>
+
+        // example: "foo.bar.baz" turns into
+        // /(['"`]foo[.]['"`$])|(['"`]foo[.]bar[.]['"`$])|(['"`]foo[.]bar[.]baz['"`])/
+        // or, nicer
+        // ( ['"`]foo[.]['"`$] )  |  ( ['"`]foo[.]bar[.]['"`$] )  |  ( ['"`]foo[.]bar[.]baz['"`] )
+        reEntry.re = new RegExp(reStr);
+      }
+
+      removalRes.add(reEntry);
+    });
+  }
+
+  if (removalCandidates.size == 0) {
+    // unexpected, but possible
+    return;
+  }
+
+  // whitelist files traversal
+  const whitelist = glob(whitelistGlob);
+
+  whitelist.every(fname => {
+    try {
+      const text = fs.readFileSync(fname, 'utf8');
+
+      removalRes.forEach(reEntry => {
+        if (reEntry.re.test(text)) {  // as soon as a key is found at least once, we don't need to test any more
+          removalCandidates.delete(reEntry.msgctxt);
+          removalRes.delete(reEntry);
+        }
+      });
+
+      return removalCandidates.size != 0;  // all keys found, no need to process further
+    }
+    catch (ex) {
+      console.error(ex);
+    }
+  });
+
+  if (removalCandidates.size == 0) {
+    return;
+  }
+
+  for (let lang in pos) {
+    pos[lang].messages = pos[lang].messages.filter(m => !removalCandidates.has(m.msgctxt));
+  }
 }
 
 module.exports = main;

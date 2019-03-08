@@ -32,6 +32,10 @@ if (argv.h || argv.help || !argv.po) {
     --messagesDir=DIRECTORY
       directory where translations go split by a language
 
+    --whiteList=GLOB
+      files that are tested for presence of the message keys;
+      the unnused keys are filtered out
+
 `);
  process.exit(0);
 }

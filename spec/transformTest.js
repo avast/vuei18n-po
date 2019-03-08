@@ -61,6 +61,13 @@ describe('po transform', function () {
     expect(pl(5)).toBe(2);
     expect(pl(22)).toBe(1);
   });
+
+  it('filters out unused keys', async function () {
+    const translations = await vuei18nPo({ po: 'spec/data/en.po', whiteList: 'spec/data/*.vue' });
+
+    expect(Object.keys(translations.en.messages)).toEqual(jasmine.arrayContaining(['about', 'issues', 'gamemode.game.run']));  // these are used in loc.vue
+    expect(Object.keys(translations.en.messages)).not.toEqual(jasmine.arrayContaining(['global.launch']));  // global.launch is never used in loc.vue
+  });
 });
 
 describe('po code generation', function () {

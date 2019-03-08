@@ -21,6 +21,10 @@ man vuei18n-po
 
     --messagesDir=DIRECTORY
       directory where translations go split by a language
+
+    --whiteList=GLOB
+      files that are tested for presence of the message keys;
+      the unnused keys are filtered out
 ```
 
 Usage
@@ -33,6 +37,7 @@ await vuei18nPo({
     pluralRules: 'spec/data/out/choices.js',
     messagesFile: 'generated/allInOne.json',
     messagesDir: 'generated',
+    whiteList: 'src/**/*.vue'
 });
 ```
 
