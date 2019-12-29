@@ -43,4 +43,37 @@ describe('VueI18n', function () {
 
     expect(vi18n.tc('issues', 2)).toBe('Byly zjištěny 2 problémy.');
   });
+
+  it('loads msgctxtless messages from a generated file', async function () {
+    await vuei18nPo({ po: [ 'spec/data/en_noctxt.po', 'spec/data/cs_noctxt.po' ], messagesDir: 'spec/data/out' });
+
+    let vi18n = new VueI18n({
+      locale: 'cs',
+      messages: {
+        en: require('./data/out/en_noctxt.json'),
+        cs: require('./data/out/cs_noctxt.json'),
+      }
+    });
+
+    expect(vi18n.t('Launch')).toBe('Spustit');
+  });
+
+  it('translates msgctxtless plurals', async function () {
+    await vuei18nPo({ po: [ 'spec/data/en_noctxt.po', 'spec/data/cs_noctxt.po' ], messagesDir: 'spec/data/out', pluralRules: 'spec/data/out/choices_noctxt.js' });
+    const choices = require('./data/out/choices_noctxt.js');
+
+    let vi18n = new VueI18n({
+      locale: 'cs',
+      messages: {
+        en: require('./data/out/en_noctxt.json'),
+        cs: require('./data/out/cs_noctxt.json')
+      },
+      pluralizationRules: {
+        en: choices.en_noctxt,
+        cs: choices.cs_noctxt
+      }
+    });
+
+    expect(vi18n.tc('%s issue found.', 2)).toBe('Byly zjištěny 2 problémy.');
+  });
 });

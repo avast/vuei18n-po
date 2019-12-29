@@ -67,7 +67,7 @@ async function main(options) {
           item.msgid + ' | ' + item.msgid_plural)
           .replace(/%s/g, '{n}');
       }
-      messages[item.msgctxt] = value;
+      messages[item.msgctxt || item.msgid] = value;
     });
   }
 

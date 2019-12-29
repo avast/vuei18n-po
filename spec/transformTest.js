@@ -4,7 +4,7 @@ const glob = require('glob').sync;
 
 describe('po transform', function () {
   it('loads all files', async function () {
-    const translations = await vuei18nPo({ po: 'spec/data/*.po' });
+    const translations = await vuei18nPo({ po: 'spec/data/??.po' });
 
     expect(Object.keys(translations)).toEqual(['cs', 'en', 'ko', 'pl']);
   });
