@@ -1,0 +1,28 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: avast-antivirus-for-win\n"
+"Language: cs_CZ\n"
+"MIME-Version: 1.0\n"
+"Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: avast-antivirus-for-win\n"
+"X-Crowdin-Language: cs\n"
+"X-Crowdin-File: en.po\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Last-Translator: Avast <chocholous@avast.com>\n"
+"Language-Team: Czech\n"
+"PO-Revision-Date: 2018-07-11 14:25\n"
+
+msgid "About"
+msgstr "O aplikaci"
+
+msgid "%s issue found."
+msgid_plural "%s issues found."
+msgstr[0] "Byl zjištěn %s problém."
+msgstr[1] "Byly zjištěny %s problémy."
+msgstr[2] "Bylo zjištěno %s problémů."
+msgstr[3] "Bylo zjištěno %s problémů."
+
+msgid "Launch"
+msgstr "Spustit"
+
