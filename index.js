@@ -88,7 +88,7 @@ async function main(options) {
       mkdir(path.dirname(options.pluralRules));
     }
 
-    let rules = '/* eslint-disable no-extra-semi */\nmodule.exports = {\n' +
+    let rules = `/* eslint-disable no-extra-semi */\n${options.es6 ? "export default" : "module.exports ="} {\n` +
       Object.keys(json).map(lang => '  "' + lang + '": ' + json[lang].plural).join(',\n') +
       '\n};\n';
 

@@ -36,6 +36,9 @@ if (argv.h || argv.help || !argv.po) {
       files that are tested for presence of the message keys;
       the unnused keys are filtered out
 
+    --es6
+      use es6 format for file generation (eg: plural file)
+
 `);
  process.exit(0);
 }
