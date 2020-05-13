@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 let argv = require('minimist')(process.argv);
+const chokidar = require('chokidar');
 
 if (argv._) {
   let myself = argv._.indexOf(__filename);
@@ -36,6 +37,9 @@ if (argv.h || argv.help || !argv.po) {
       files that are tested for presence of the message keys;
       the unnused keys are filtered out
 
+    --watch
+      watch for file change to regenerate files
+
 `);
  process.exit(0);
 }
@@ -50,4 +54,10 @@ const vuei18nPo = require('./index.js');
 
 delete argv._;
 
-vuei18nPo(argv);
+if (argv.watch) {
+  console.log("Watch for file change...");
+  chokidar.watch(argv.po).on('add', () => vuei18nPo(argv));
+  chokidar.watch(argv.po).on('change', () => vuei18nPo(argv));
+} else {
+  vuei18nPo(argv);
+}
