@@ -155,10 +155,11 @@ function filterByWhitelist(whitelistGlob, pos) {
   // preprocess the messages from *.po so that we can traverse the disk with whitelist files in one go
   for (let lang in pos) {
     pos[lang].messages.forEach(m => {
-      if (removalCandidates.has(m.msgctxt)) {
+      const msgctxt = m.msgctxt || m.msgid;
+      if (removalCandidates.has(msgctxt)) {
         return;
       }
-      if (!m.msgctxt) {
+      if (!msgctxt) {
         let meaningfulCopy = {};
         for (let k in m) {
           if (!!m[k] && (typeof m[k] !== 'object' || Object.keys(m[k]).length > 0))
@@ -168,18 +169,18 @@ function filterByWhitelist(whitelistGlob, pos) {
         return;
       }
 
-      removalCandidates.add(m.msgctxt);
+      removalCandidates.add(msgctxt);
 
-      let reEntry = { msgctxt: m.msgctxt };
+      let reEntry = { msgctxt: msgctxt };
 
-      if (m.msgctxt.indexOf('.') == -1) {
-        reEntry.re = new RegExp('[\'"`]' + m.msgctxt + '[\'"`]');
+      if (msgctxt.indexOf('.') == -1) {
+        reEntry.re = new RegExp('[\'"`]' + msgctxt + '[\'"`]');
       }
       else {
         // either one of the components ends with .', .", .` or .$ or the full key matches
         // `namespace + '.rest.of.the.path'` will thus fail
         // also, `foo.${something}.bar` will incorrectly let foo.xxx.yyy in
-        const components = m.msgctxt.split('.');
+        const components = msgctxt.split('.');
         const reStr = '([\'"`]' + components.slice(1)
           .reduce((prefixes, val, idx) => {  // reduce returns an array of strings [ c0, c0[.]c1, c0[.]c1[.]c2, ... ]
             prefixes.push(prefixes[idx] + '[.]' + val);  // take the last entry in the array and create a new one, one component longer
@@ -230,7 +231,7 @@ function filterByWhitelist(whitelistGlob, pos) {
   }
 
   for (let lang in pos) {
-    pos[lang].messages = pos[lang].messages.filter(m => !removalCandidates.has(m.msgctxt));
+    pos[lang].messages = pos[lang].messages.filter(m => !removalCandidates.has(m.msgctxt || m.msgid));
   }
 }
 
